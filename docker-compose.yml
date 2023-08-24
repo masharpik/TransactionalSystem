@@ -16,15 +16,19 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
-  bot:
-    image: golang:1.20.5-alpine3.18
+  backend-server:
+    build: .
     restart: always
     depends_on:
       - db
     volumes:
-      - ${PWD}:/app:ro
-    command: go run app/main.go
+      - go-modules:/go/pkg/mod
+    ports:
+    - "${SERVER_APP_PORT}:${SERVER_APP_PORT}"
+    working_dir: /app
+    command: go run main.go
 
 volumes:
   db_data:
     driver: local
+  go-modules:

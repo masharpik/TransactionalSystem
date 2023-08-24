@@ -14,7 +14,11 @@ import (
 var DebugOn bool
 
 func InitLogger() {
-	file, err := os.OpenFile("logs/file.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if !DebugOn {
+		return
+	}
+
+	file, err := os.OpenFile("file.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		logrus.Warn(literals.LogOpenLogFileError, err)
 		logrus.SetFormatter(&logrus.TextFormatter{
@@ -56,6 +60,7 @@ func LogRequestSuccess(r *http.Request, statusCode int) {
 	if !DebugOn {
 		return
 	}
+
 	info := getRequestInfo(r)
 	info["status"] = statusCode
 	logrus.WithFields(logrus.Fields(info)).Info(literals.LogRequestSuccess)
@@ -65,6 +70,7 @@ func LogRequestError(r *http.Request, statusCode int, err error) {
 	if !DebugOn {
 		return
 	}
+
 	info := getRequestInfo(r)
 	info["error"] = err
 	info["status"] = statusCode
@@ -75,6 +81,7 @@ func LogOperationSuccess(operations ...string) {
 	if !DebugOn {
 		return
 	}
+
 	logrus.Info(strings.Join(operations, " "))
 }
 
@@ -82,6 +89,7 @@ func LogOperationError(err error) {
 	if !DebugOn {
 		return
 	}
+
 	logrus.Error(err)
 }
 
