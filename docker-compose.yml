@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:12
+    restart: always
+    volumes:
+      - type: volume
+        source: db_data
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: ./scripts/db.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "${DB_PORT}:5432"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+
+volumes:
+  db_data:
+    driver: local
