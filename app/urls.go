@@ -32,7 +32,7 @@ func RegisterUrls() (r *mux.Router, err error) {
 		return
 	}
 
-	transactionService, err := transactionservice.NewService(transactionRepo)
+	transactionService, err := transactionservice.NewService(transactionRepo, authRepo)
 	if err != nil {
 		return
 	}

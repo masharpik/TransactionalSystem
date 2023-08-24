@@ -1,24 +1,19 @@
 package transactionservice
 
 import (
-	"fmt"
-
-	"github.com/masharpik/TransactionalSystem/app/transaction/interfaces"
-	"github.com/masharpik/TransactionalSystem/utils/literals"
+	authinterfaces "github.com/masharpik/TransactionalSystem/app/auth/interfaces"
+	transactioninterfaces "github.com/masharpik/TransactionalSystem/app/transaction/interfaces"
 )
 
 type Service struct {
-	repo transactioninterfaces.ITransactionRepository
+	transactionRepo transactioninterfaces.ITransactionRepository
+	authRepo        authinterfaces.IAuthRepository
 }
 
-func NewService(repo transactioninterfaces.ITransactionRepository) (*Service, error) {
+func NewService(transactionRepo transactioninterfaces.ITransactionRepository, authRepo authinterfaces.IAuthRepository) (*Service, error) {
 	service := &Service{
-		repo: repo,
-	}
-
-	_, ok := interface{}(service).(transactioninterfaces.ITransactionService)
-	if !ok {
-		return nil, fmt.Errorf(literals.LogStructNotSatisfyInterface, "TransactionService")
+		transactionRepo: transactionRepo,
+		authRepo:        authRepo,
 	}
 
 	return service, nil

@@ -12,5 +12,5 @@ const (
 	LogConnDBFailed                             = "Не удалось подключиться к БД: %w"
 	LogConnDBTimeout                            = "Время на попытку подключиться к БД вышло"
 	LogConnDBSuccess                            = "Подключение к бд произошло успешно: %s"
-	LogStructNotSatisfyInterface                = "Реализация структуры не удовлетворяет интерфейсу: %s"
+	CodeUniqConflict                            = "23505"
 )

@@ -1,8 +1,11 @@
-.PHONY: up down dbclean serverclean reup
+.PHONY: up down clean
 
 up:
-	docker-compose build --no-cache
 	docker compose up
 
 down:
 	docker compose down
+
+clean:
+	docker rm bwg-db-1
+	docker volume rm bwg_db_data

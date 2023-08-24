@@ -17,10 +17,13 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
   backend-server:
-    build: .
+    image: golang:1.20.5-alpine3.18
     restart: always
     depends_on:
       - db
+    volumes:
+      - go-modules:/go/pkg/mod
+      - ${PWD}:/app/
     ports:
     - "${SERVER_APP_PORT}:${SERVER_APP_PORT}"
     working_dir: /app
@@ -29,3 +32,4 @@ services:
 volumes:
   db_data:
     driver: local
+  go-modules:

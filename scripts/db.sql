@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS users(
+   ID TEXT COLLATE "ucs_basic" PRIMARY KEY,
+   balance NUMERIC(15, 2) DEFAULT 0
+);
