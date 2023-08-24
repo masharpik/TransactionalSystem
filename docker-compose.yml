@@ -16,6 +16,14 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+  bot:
+    image: golang:1.20.5-alpine3.18
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ${PWD}:/app:ro
+    command: go run app/main.go
 
 volumes:
   db_data:

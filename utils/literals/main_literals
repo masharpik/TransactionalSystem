@@ -1,0 +1,7 @@
+package literals
+
+const (
+	LogOpenLogFileError = "Не удалось открыть файл или директорию для логирования, будет использоваться дефолтное os.Stderr"
+	LogRequestSuccess   = "Запрос выполнился успешно"
+	LogRequestError     = "Запрос выполнился неуспешно"
+)
