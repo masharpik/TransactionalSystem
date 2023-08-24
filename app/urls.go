@@ -3,11 +3,15 @@ package app
 import (
 	"github.com/gorilla/mux"
 
-	"github.com/masharpik/TransactionalSystem/app/delivery"
-	"github.com/masharpik/TransactionalSystem/app/interfaces"
+	authdelivery "github.com/masharpik/TransactionalSystem/app/auth/delivery"
+	authinterfaces "github.com/masharpik/TransactionalSystem/app/auth/interfaces"
+	authrepository "github.com/masharpik/TransactionalSystem/app/auth/repository"
+	authservice "github.com/masharpik/TransactionalSystem/app/auth/service"
 	"github.com/masharpik/TransactionalSystem/app/middleware"
-	"github.com/masharpik/TransactionalSystem/app/repository"
-	"github.com/masharpik/TransactionalSystem/app/service"
+	transactiondelivery "github.com/masharpik/TransactionalSystem/app/transaction/delivery"
+	transactioninterfaces "github.com/masharpik/TransactionalSystem/app/transaction/interfaces"
+	transactionrepository "github.com/masharpik/TransactionalSystem/app/transaction/repository"
+	transactionservice "github.com/masharpik/TransactionalSystem/app/transaction/service"
 )
 
 func RegisterUrls() (r *mux.Router, err error) {
@@ -16,19 +20,34 @@ func RegisterUrls() (r *mux.Router, err error) {
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	apiRouter.Use(middleware.JSONMiddleware)
 
-	var repo interfaces.IRepository
-	repo, err = repository.NewRepository()
+	conn, err := getConnectionDB()
+	var transactionRepo transactioninterfaces.ITransactionRepository
+	transactionRepo = transactionrepository.NewRepository(conn)
+	if err != nil {
+		return
+	}
+	var authRepo authinterfaces.IAuthRepository
+	authRepo = authrepository.NewRepository(conn)
 	if err != nil {
 		return
 	}
 
-	service, err := service.NewService(repo)
+	transactionService, err := transactionservice.NewService(transactionRepo)
+	if err != nil {
+		return
+	}
+	authService, err := authservice.NewService(authRepo)
 	if err != nil {
 		return
 	}
 
 	transactionSubrouter := apiRouter.PathPrefix("/transaction").Subrouter()
-	err = delivery.RegisterHandlers(transactionSubrouter, service)
+	err = transactiondelivery.RegisterHandlers(transactionSubrouter, transactionService)
+	if err != nil {
+		return
+	}
+	authSubrouter := apiRouter.PathPrefix("/auth").Subrouter()
+	err = authdelivery.RegisterHandlers(authSubrouter, authService)
 	if err != nil {
 		return
 	}

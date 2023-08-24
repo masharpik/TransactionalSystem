@@ -1,4 +1,4 @@
-package repository
+package app
 
 import (
 	"context"
@@ -10,10 +10,6 @@ import (
 	"github.com/masharpik/TransactionalSystem/utils/literals"
 	"github.com/masharpik/TransactionalSystem/utils/logger"
 )
-
-type Repository struct {
-	pool *pgxpool.Pool
-}
 
 func loadConfigUrl() string {
 	host := os.Getenv("DB_HOST")
@@ -51,17 +47,4 @@ func getConnectionDB() (conn *pgxpool.Pool, err error) {
 			}
 		}
 	}
-}
-
-func NewRepository() (repo *Repository, err error) {
-	var pool *pgxpool.Pool
-	pool, err = getConnectionDB()
-	if err != nil {
-		return
-	}
-
-	repo = &Repository{
-		pool: pool,
-	}
-	return
 }

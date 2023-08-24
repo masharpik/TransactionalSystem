@@ -1,8 +1,8 @@
-package interfaces
+package transactioninterfaces
 
 import "net/http"
 
-type IDelivery interface {
+type ITransactionDelivery interface {
 	InputHandler(http.ResponseWriter, *http.Request)
 	OutputHandler(http.ResponseWriter, *http.Request)
 }
