@@ -2,6 +2,7 @@ package transactionservice
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	authUtils "github.com/masharpik/TransactionalSystem/app/auth/utils"
@@ -32,7 +33,17 @@ func (service *Service) InputMoney(userId string, amount float64) (user authUtil
 }
 
 func (service *Service) OutputMoney(userId string, amount float64, link string) (status utils.StatusTransaction, err error) {
-	curr, err := service.authRepo.MinusBalance(userId, amount)
+	curr, secondTransaction := math.Inf(1), false
+	defer func() {
+		if !math.IsInf(curr, 1) && !secondTransaction {
+			_, err := service.authRepo.PlusBalance(userId, amount)
+			if err != nil {
+				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть баланс обратно: %w", err))
+				return
+			}
+		}
+	}()
+	curr, err = service.authRepo.MinusBalance(userId, amount)
 	if err != nil {
 		logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
 		return
@@ -50,6 +61,8 @@ func (service *Service) OutputMoney(userId string, amount float64, link string) 
 
 	go func() {
 		<-time.After(5 * time.Second)
+		// Здесь в принципе банк вернет какой-то результат и по нему можно будет смотреть, выполнил ли банк операцию, но пока заглушка с флагом
+		secondTransaction = true
 		err = nil // Гипотетический результат от банка
 		if err != nil {
 			logger.LogOperationError(fmt.Errorf("Произошла ошибка при запросе к банку: %w\nВозврат средств произойдет в течении нескольких минут.", err))
