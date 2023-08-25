@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"fmt"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/masharpik/TransactionalSystem/utils/literals"
@@ -11,7 +10,11 @@ import (
 	"github.com/streadway/amqp"
 )
 
-var taskMap sync.Map
+type taskData struct {
+	UserID    string  `json:"userId"`
+	NewAmount float64 `json:"newAmount"`
+	Link      string  `json:"link"`
+}
 
 func failOnError(err error, msg string) {
 	if err != nil {

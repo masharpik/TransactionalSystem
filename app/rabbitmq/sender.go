@@ -1,10 +1,9 @@
 package rabbitmq
 
 import (
+	"encoding/json"
 	"os"
 
-	"github.com/google/uuid"
-	"github.com/masharpik/TransactionalSystem/utils/logger"
 	"github.com/streadway/amqp"
 )
 
@@ -37,13 +36,17 @@ func (sender *Sender) getQueue() (err error) {
 	return
 }
 
-func (sender *Sender) PushTask(callback func()) (err error) {
-	uuid, err := uuid.NewUUID()
-	if err != nil {
-		logger.LogOperationError(err)
+func (sender *Sender) PushTask(userId string, newAmount float64, link string) (err error) {
+	data := taskData{
+		UserID:    userId,
+		NewAmount: newAmount,
+		Link:      link,
 	}
-	taskId := uuid.String()
-	taskMap.Store(taskId, callback)
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
 
 	err = sender.ch.Publish(
 		"",                // exchange
@@ -51,8 +54,9 @@ func (sender *Sender) PushTask(callback func()) (err error) {
 		false,             // mandatory
 		false,             // immediate
 		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(taskId),
+			ContentType: "application/json",
+			Body:        jsonData,
 		})
+
 	return
 }

@@ -2,7 +2,6 @@ package transactionservice
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 
 	authUtils "github.com/masharpik/TransactionalSystem/app/auth/utils"
@@ -44,30 +43,28 @@ func (service *Service) OutputMoney(userId string, amount float64, link string) 
 		err = fmt.Errorf(utils.LogUnderfundedError)
 		return
 	}
-	
+
 	go func() {
+		err := service.authRepo.UpdateBalance(userId, newAmount)
+		if err != nil {
+			logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
+			return
+		}
+
 		<-time.After(5 * time.Second)
-
-		client := &http.Client{}
-		req, _ := http.NewRequest("GET", link, nil)
-
-		callback := func() {
-			err := service.authRepo.UpdateBalance(userId, newAmount)
+		err = nil // Гипотетический результат от банка
+		if err != nil {
+			logger.LogOperationError(fmt.Errorf("Произошла ошибка при запросе к банку: %w\nВозврат средств произойдет в течении нескольких минут.", err))
+			err := service.authRepo.UpdateBalance(userId, oldAmount)
 			if err != nil {
-				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
-				req.Header.Set("Custom-Status", "500")
+				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть средства на баланс: %w", err))
 				return
 			}
 
-			logger.LogOperationSuccess(fmt.Sprintf("Снятие с баланса.\nТекущее состояние пользователя: %s\nБаланс: %f\n", userId, newAmount))
-			req.Header.Set("Custom-Status", "200")
-
-			_, err = client.Do(req)
-			if err != nil {
-				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке отослать простой GET-запрос: %w", err))
-			}
+			return
 		}
-		service.sender.PushTask(callback)
+
+		service.sender.PushTask(userId, newAmount, link)
 	}()
 
 	status = utils.StatusTransaction{
