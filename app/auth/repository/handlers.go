@@ -47,3 +47,19 @@ func (repo *Repository) UpdateBalance(userId string, newAmount float64) (err err
 
 	return
 }
+
+func (repo *Repository) MinusBalance(userId string, minus float64) (curr float64, err error) {
+	updateBalanceQuery := `UPDATE users SET balance = balance - $1 WHERE ID = $2 RETURNING balance;`
+
+	err = repo.pool.QueryRow(context.Background(), updateBalanceQuery, minus, userId).Scan(&curr)
+
+	return
+}
+
+func (repo *Repository) PlusBalance(userId string, plus float64) (curr float64, err error) {
+	updateBalanceQuery := `UPDATE users SET balance = balance + $1 WHERE ID = $2 RETURNING balance;`
+
+	err = repo.pool.QueryRow(context.Background(), updateBalanceQuery, plus, userId).Scan(&curr)
+
+	return
+}

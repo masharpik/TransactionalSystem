@@ -32,30 +32,28 @@ func (service *Service) InputMoney(userId string, amount float64) (user authUtil
 }
 
 func (service *Service) OutputMoney(userId string, amount float64, link string) (status utils.StatusTransaction, err error) {
-	var oldAmount float64
-	oldAmount, err = service.authRepo.GetUser(userId)
+	curr, err := service.authRepo.MinusBalance(userId, amount)
 	if err != nil {
+		logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
 		return
 	}
 
-	newAmount := oldAmount - amount
-	if newAmount < 0 {
+	if curr < 0 {
+		_, err = service.authRepo.PlusBalance(userId, amount)
+		if err != nil {
+			logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть баланс обратно: %w", err))
+			return
+		}
 		err = fmt.Errorf(utils.LogUnderfundedError)
 		return
 	}
 
 	go func() {
-		err := service.authRepo.UpdateBalance(userId, newAmount)
-		if err != nil {
-			logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
-			return
-		}
-
 		<-time.After(5 * time.Second)
 		err = nil // Гипотетический результат от банка
 		if err != nil {
 			logger.LogOperationError(fmt.Errorf("Произошла ошибка при запросе к банку: %w\nВозврат средств произойдет в течении нескольких минут.", err))
-			err := service.authRepo.UpdateBalance(userId, oldAmount)
+			_, err := service.authRepo.PlusBalance(userId, amount)
 			if err != nil {
 				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть средства на баланс: %w", err))
 				return
@@ -64,7 +62,7 @@ func (service *Service) OutputMoney(userId string, amount float64, link string) 
 			return
 		}
 
-		service.sender.PushTask(userId, newAmount, link)
+		service.sender.PushTask(userId, curr, link)
 	}()
 
 	status = utils.StatusTransaction{
