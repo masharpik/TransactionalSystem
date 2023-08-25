@@ -15,6 +15,28 @@ func (service *Service) InputMoney(userId string, amount float64) (user authUtil
 	}
 
 	newAmount := oldAmount + amount
+
+	err = service.authRepo.UpdateBalance(userId, newAmount)
+	if err != nil {
+		return
+	}
+
+	user = authUtils.User{
+		UserID:  userId,
+		Balance: newAmount,
+	}
+
+	return
+}
+
+func (service *Service) OutputMoney(userId string, amount float64, link string) (user authUtils.User, err error) {
+	var oldAmount float64
+	oldAmount, err = service.authRepo.GetUser(userId)
+	if err != nil {
+		return
+	}
+
+	newAmount := oldAmount - amount
 	if newAmount < 0 {
 		err = fmt.Errorf(utils.LogUnderfundedError)
 		return
@@ -26,7 +48,7 @@ func (service *Service) InputMoney(userId string, amount float64) (user authUtil
 	}
 
 	user = authUtils.User{
-		UserID: userId,
+		UserID:  userId,
 		Balance: newAmount,
 	}
 
