@@ -17,7 +17,80 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(in *jlexer.Lexer, out *OutputTransaction) {
+func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(in *jlexer.Lexer, out *StatusTransaction) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "userId":
+			out.UserID = string(in.String())
+		case "status":
+			out.Status = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(out *jwriter.Writer, in StatusTransaction) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"userId\":"
+		out.RawString(prefix[1:])
+		out.String(string(in.UserID))
+	}
+	{
+		const prefix string = ",\"status\":"
+		out.RawString(prefix)
+		out.String(string(in.Status))
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v StatusTransaction) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v StatusTransaction) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *StatusTransaction) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *StatusTransaction) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(l, v)
+}
+func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(in *jlexer.Lexer, out *OutputTransaction) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -52,7 +125,7 @@ func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUt
 		in.Consumed()
 	}
 }
-func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(out *jwriter.Writer, in OutputTransaction) {
+func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(out *jwriter.Writer, in OutputTransaction) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -77,27 +150,27 @@ func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUt
 // MarshalJSON supports json.Marshaler interface
 func (v OutputTransaction) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(&w, v)
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v OutputTransaction) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils(w, v)
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *OutputTransaction) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(&r, v)
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *OutputTransaction) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils(l, v)
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(l, v)
 }
-func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(in *jlexer.Lexer, out *InputTransaction) {
+func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(in *jlexer.Lexer, out *InputTransaction) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -130,7 +203,7 @@ func easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUt
 		in.Consumed()
 	}
 }
-func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(out *jwriter.Writer, in InputTransaction) {
+func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(out *jwriter.Writer, in InputTransaction) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -150,23 +223,23 @@ func easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUt
 // MarshalJSON supports json.Marshaler interface
 func (v InputTransaction) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(&w, v)
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v InputTransaction) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(w, v)
+	easyjson6a975c40EncodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *InputTransaction) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(&r, v)
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *InputTransaction) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils1(l, v)
+	easyjson6a975c40DecodeGithubComMasharpikTransactionalSystemAppTransactionUtils2(l, v)
 }

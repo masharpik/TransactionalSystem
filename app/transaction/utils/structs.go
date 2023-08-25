@@ -12,3 +12,8 @@ type OutputTransaction struct {
 	Amount float64 `json:"amount"`
 	Link   string  `json:"link"`
 }
+
+type StatusTransaction struct {
+	UserID string `json:"userId"`
+	Status string `json:"status"`
+}

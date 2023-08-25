@@ -8,6 +8,7 @@ import (
 	"github.com/mailru/easyjson"
 	authUtils "github.com/masharpik/TransactionalSystem/app/auth/utils"
 	"github.com/masharpik/TransactionalSystem/app/transaction/utils"
+	"github.com/masharpik/TransactionalSystem/utils/logger"
 	"github.com/masharpik/TransactionalSystem/utils/writer"
 )
 
@@ -86,7 +87,7 @@ func (router *Delivery) OutputHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := router.service.OutputMoney(transaction.UserID, transaction.Amount, transaction.Link)
+	status, err := router.service.OutputMoney(transaction.UserID, transaction.Amount, transaction.Link)
 	if err != nil {
 		errStr := err.Error()
 
@@ -103,6 +104,10 @@ func (router *Delivery) OutputHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(transaction)
-	writer.WriteSuccessJSONResponse(w, r, http.StatusOK, user)
+	writer.WriteSuccessJSONResponse(w, r, http.StatusOK, status)
+}
+
+func (router *Delivery) TestHandler(w http.ResponseWriter, r *http.Request) {
+	customStatus := r.Header.Get("Custom-Status")
+    logger.LogOperationSuccess("Custom-Status получен из простого GET-запроса:", customStatus)
 }

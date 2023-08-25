@@ -2,18 +2,18 @@ package transactionservice
 
 import (
 	authinterfaces "github.com/masharpik/TransactionalSystem/app/auth/interfaces"
-	transactioninterfaces "github.com/masharpik/TransactionalSystem/app/transaction/interfaces"
+	"github.com/masharpik/TransactionalSystem/app/rabbitmq"
 )
 
 type Service struct {
-	transactionRepo transactioninterfaces.ITransactionRepository
-	authRepo        authinterfaces.IAuthRepository
+	sender   *rabbitmq.Sender
+	authRepo authinterfaces.IAuthRepository
 }
 
-func NewService(transactionRepo transactioninterfaces.ITransactionRepository, authRepo authinterfaces.IAuthRepository) (*Service, error) {
+func NewService(sender *rabbitmq.Sender, authRepo authinterfaces.IAuthRepository) (*Service, error) {
 	service := &Service{
-		transactionRepo: transactionRepo,
-		authRepo:        authRepo,
+		sender:   sender,
+		authRepo: authRepo,
 	}
 
 	return service, nil

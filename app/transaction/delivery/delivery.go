@@ -19,6 +19,7 @@ func RegisterHandlers(r *mux.Router, service transactioninterfaces.ITransactionS
 
 	router.router.HandleFunc("/input", router.InputHandler).Methods("PUT")
 	router.router.HandleFunc("/output", router.OutputHandler).Methods("PUT")
+	router.router.HandleFunc("/test", router.TestHandler).Methods("GET")
 
 	return nil
 }

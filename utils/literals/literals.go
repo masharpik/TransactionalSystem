@@ -13,4 +13,9 @@ const (
 	LogConnDBTimeout                            = "Время на попытку подключиться к БД вышло"
 	LogConnDBSuccess                            = "Подключение к бд произошло успешно: %s"
 	CodeUniqConflict                            = "23505"
+	LogOpenningRabbitMQConnError                = "Не удалось открыть соединение с брокером сообщений"
+	LogOpenningRabbitMQCChannelError            = "Не удалось открыть канал с брокером сообщений: %w"
+	LogDeclarationRabbitMQQueueError            = "Ошибка в создании очереди в брокере сообщений: %w"
+	LogDeclarationRabbitMQConsumerError         = "Ошибка в создании обработчике в брокере сообщений: %w"
+	LogConnRabbitMQSuccess                      = "Подключение к брокеру сообщений успешно"
 )

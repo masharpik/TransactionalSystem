@@ -16,11 +16,21 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+  message-broker:
+    image: rabbitmq:3.12.3-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
   backend-server:
     image: golang:1.20.5-alpine3.18
     restart: always
     depends_on:
       - db
+      - message-broker
     volumes:
       - go-modules:/go/pkg/mod
       - ${PWD}:/app/
