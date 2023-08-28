@@ -2,8 +2,10 @@ package rabbitmq
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
+	"github.com/masharpik/TransactionalSystem/app/transaction/utils"
 	"github.com/streadway/amqp"
 )
 
@@ -36,16 +38,10 @@ func (sender *Sender) getQueue() (err error) {
 	return
 }
 
-func (sender *Sender) PushTask(userId string, newAmount float64, link string) (err error) {
-	data := taskData{
-		UserID:    userId,
-		NewAmount: newAmount,
-		Link:      link,
-	}
-
-	jsonData, err := json.Marshal(data)
+func (sender *Sender) PushTask(status utils.StatusTransaction) (err error) {
+	jsonData, err := json.Marshal(status)
 	if err != nil {
-		return err
+		return fmt.Errorf("Произошла ошибка при создании таска (Marshal'инге данных): %w", err)
 	}
 
 	err = sender.ch.Publish(
@@ -56,7 +52,11 @@ func (sender *Sender) PushTask(userId string, newAmount float64, link string) (e
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        jsonData,
-		})
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("Произошла ошибка при пуше таска: %w", err)
+	}
 
 	return
 }

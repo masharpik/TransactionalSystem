@@ -51,10 +51,10 @@ func (mr *MockITransactionServiceMockRecorder) InputMoney(arg0, arg1 interface{}
 }
 
 // OutputMoney mocks base method.
-func (m *MockITransactionService) OutputMoney(arg0 string, arg1 float64, arg2 string) (utils0.StatusTransaction, error) {
+func (m *MockITransactionService) OutputMoney(arg0 string, arg1 float64, arg2 string) (utils0.OutputTransactionResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OutputMoney", arg0, arg1, arg2)
-	ret0, _ := ret[0].(utils0.StatusTransaction)
+	ret0, _ := ret[0].(utils0.OutputTransactionResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

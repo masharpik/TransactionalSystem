@@ -10,18 +10,6 @@ import (
 	"github.com/streadway/amqp"
 )
 
-type taskData struct {
-	UserID    string  `json:"userId"`
-	NewAmount float64 `json:"newAmount"`
-	Link      string  `json:"link"`
-}
-
-func failOnError(err error, msg string) {
-	if err != nil {
-		logger.LogOperationFatal(fmt.Errorf("%s: %s", msg, err))
-	}
-}
-
 func GetConnUrl() string {
 	name := os.Getenv("RABBITMQ_USER")
 	pass := os.Getenv("RABBITMQ_PASS")

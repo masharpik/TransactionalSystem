@@ -2,7 +2,6 @@ package transactionservice
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	authUtils "github.com/masharpik/TransactionalSystem/app/auth/utils"
@@ -11,76 +10,66 @@ import (
 )
 
 func (service *Service) InputMoney(userId string, amount float64) (user authUtils.User, err error) {
-	var oldAmount float64
-	oldAmount, err = service.authRepo.GetUser(userId)
-	if err != nil {
-		return
-	}
-
-	newAmount := oldAmount + amount
-
-	err = service.authRepo.UpdateBalance(userId, newAmount)
+	curr, err := service.authRepo.PlusBalance(userId, amount)
 	if err != nil {
 		return
 	}
 
 	user = authUtils.User{
 		UserID:  userId,
-		Balance: newAmount,
+		Balance: curr,
 	}
 
 	return
 }
 
-func (service *Service) OutputMoney(userId string, amount float64, link string) (status utils.StatusTransaction, err error) {
-	curr, secondTransaction := math.Inf(1), false
-	defer func() {
-		if !math.IsInf(curr, 1) && !secondTransaction {
-			_, err := service.authRepo.PlusBalance(userId, amount)
-			if err != nil {
-				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть баланс обратно: %w", err))
-				return
-			}
-		}
-	}()
-	curr, err = service.authRepo.MinusBalance(userId, amount)
+func (service *Service) OutputMoney(userId string, amount float64, link string) (res utils.OutputTransactionResponse, err error) {
+	curr, err := service.authRepo.MinusBalance(userId, amount)
 	if err != nil {
-		logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке записать в бд снятие с баланса: %w", err))
-		return
-	}
-
-	if curr < 0 {
-		_, err = service.authRepo.PlusBalance(userId, amount)
-		if err != nil {
-			logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть баланс обратно: %w", err))
-			return
+		res = utils.OutputTransactionResponse{
+			UserID: userId,
+			Status: err.Error(),
 		}
-		err = fmt.Errorf(utils.LogUnderfundedError)
 		return
 	}
 
 	go func() {
+		// Имитация запроса в банк
 		<-time.After(5 * time.Second)
-		// Здесь в принципе банк вернет какой-то результат и по нему можно будет смотреть, выполнил ли банк операцию, но пока заглушка с флагом
-		secondTransaction = true
-		err = nil // Гипотетический результат от банка
+		err = nil // Возврат банка
+
+		var status utils.StatusTransaction
 		if err != nil {
-			logger.LogOperationError(fmt.Errorf("Произошла ошибка при запросе к банку: %w\nВозврат средств произойдет в течении нескольких минут.", err))
-			_, err := service.authRepo.PlusBalance(userId, amount)
+			curr, err = service.authRepo.PlusBalance(userId, amount)
 			if err != nil {
-				logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке вернуть средства на баланс: %w", err))
+				logger.LogOperationError(err)
 				return
 			}
 
-			return
+			status = utils.StatusTransaction{
+				UserID:      userId,
+				Status:      fmt.Sprintf("Произошла ошибка от банка: %s", err.Error()),
+				Balance:     curr,
+				Destination: link,
+			}
+		} else {
+			status = utils.StatusTransaction{
+				UserID:      userId,
+				Status:      "Списание успешно",
+				Balance:     curr,
+				Destination: link,
+			}
 		}
 
-		service.sender.PushTask(userId, curr, link)
+		if err = service.sender.PushTask(status); err != nil {
+			logger.LogOperationError(err)
+			return
+		}
 	}()
 
-	status = utils.StatusTransaction{
+	res = utils.OutputTransactionResponse{
 		UserID: userId,
-		Status: fmt.Sprintf("Информация по результату снятия придет по ссылке: %s", link),
+		Status: fmt.Sprintf("Запрос на вывод средств взят в работу. По завершении мы отправим уведомление сюда: %s", link),
 	}
 	return
 }

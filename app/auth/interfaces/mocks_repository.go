@@ -48,31 +48,32 @@ func (mr *MockIAuthRepositoryMockRecorder) CreateUser(arg0 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockIAuthRepository)(nil).CreateUser), arg0)
 }
 
-// GetUser mocks base method.
-func (m *MockIAuthRepository) GetUser(arg0 string) (float64, error) {
+// MinusBalance mocks base method.
+func (m *MockIAuthRepository) MinusBalance(arg0 string, arg1 float64) (float64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUser", arg0)
+	ret := m.ctrl.Call(m, "MinusBalance", arg0, arg1)
 	ret0, _ := ret[0].(float64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetUser indicates an expected call of GetUser.
-func (mr *MockIAuthRepositoryMockRecorder) GetUser(arg0 interface{}) *gomock.Call {
+// MinusBalance indicates an expected call of MinusBalance.
+func (mr *MockIAuthRepositoryMockRecorder) MinusBalance(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUser", reflect.TypeOf((*MockIAuthRepository)(nil).GetUser), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MinusBalance", reflect.TypeOf((*MockIAuthRepository)(nil).MinusBalance), arg0, arg1)
 }
 
-// UpdateBalance mocks base method.
-func (m *MockIAuthRepository) UpdateBalance(arg0 string, arg1 float64) error {
+// PlusBalance mocks base method.
+func (m *MockIAuthRepository) PlusBalance(arg0 string, arg1 float64) (float64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateBalance", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret := m.ctrl.Call(m, "PlusBalance", arg0, arg1)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-// UpdateBalance indicates an expected call of UpdateBalance.
-func (mr *MockIAuthRepositoryMockRecorder) UpdateBalance(arg0, arg1 interface{}) *gomock.Call {
+// PlusBalance indicates an expected call of PlusBalance.
+func (mr *MockIAuthRepositoryMockRecorder) PlusBalance(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBalance", reflect.TypeOf((*MockIAuthRepository)(nil).UpdateBalance), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PlusBalance", reflect.TypeOf((*MockIAuthRepository)(nil).PlusBalance), arg0, arg1)
 }

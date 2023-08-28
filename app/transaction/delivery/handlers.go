@@ -89,25 +89,22 @@ func (router *Delivery) OutputHandler(w http.ResponseWriter, r *http.Request) {
 
 	status, err := router.service.OutputMoney(transaction.UserID, transaction.Amount, transaction.Link)
 	if err != nil {
-		errStr := err.Error()
-
-		switch errStr {
-		case utils.LogUnderfundedError:
-			writer.WriteErrorMessageRespond(w, r, http.StatusUnprocessableEntity, errStr)
-			return
-		case authUtils.LogUserNotFoundError:
-			writer.WriteErrorMessageRespond(w, r, http.StatusUnauthorized, errStr)
-			return
-		default:
-			writer.WriteErrorMessageRespond(w, r, http.StatusInternalServerError, errStr)
-			return
-		}
+		writer.WriteErrorMessageRespond(w, r, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	writer.WriteSuccessJSONResponse(w, r, http.StatusOK, status)
 }
 
 func (router *Delivery) TestHandler(w http.ResponseWriter, r *http.Request) {
+	customCode := r.Header.Get("Custom-Code")
 	customStatus := r.Header.Get("Custom-Status")
-    logger.LogOperationSuccess("Custom-Status получен из простого GET-запроса:", customStatus)
+	customUserId := r.Header.Get("Custom-UserId")
+	customBalance := r.Header.Get("Custom-Balance")
+	logger.LogOperationSuccess(
+		fmt.Sprintf(
+			"\n\nПолучено уведомлении о снятии средств:\nКод возврата: %s\nСтатус: %s\nПользователь: %s\nСостояние баланса: %s\n",
+			customCode, customStatus, customUserId, customBalance,
+		),
+	)
 }

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/masharpik/TransactionalSystem/app/transaction/utils"
 	"github.com/masharpik/TransactionalSystem/utils/logger"
 	"github.com/streadway/amqp"
 )
@@ -43,20 +44,21 @@ func (consumer *Consumer) getConsume() (msgs <-chan amqp.Delivery, err error) {
 	return
 }
 
-func (consumer *Consumer) sendMessage(d amqp.Delivery, userId string, newAmount float64, link string) {
+func (consumer *Consumer) sendMessage(d amqp.Delivery, status string, userId string, balance float64, link string) {
+	var err error
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", link, nil)
 
-	logger.LogOperationSuccess(fmt.Sprintf("Снятие с баланса.\nТекущее состояние пользователя: %s\nБаланс: %f\n", userId, newAmount))
-	req.Header.Set("Custom-Status", "200")
+	req.Header.Set("Custom-Code", "200")
+	req.Header.Set("Custom-Status", status)
+	req.Header.Set("Custom-UserId", userId)
+	req.Header.Set("Custom-Balance", fmt.Sprint(balance))
 
-	_, err := client.Do(req)
-	if err != nil {
+	if _, err = client.Do(req); err != nil {
 		logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке отослать простой GET-запрос: %w", err))
 	}
 
-	err = d.Ack(false)
-	if err != nil {
+	if err = d.Ack(false); err != nil {
 		logger.LogOperationError(fmt.Errorf("Произошла ошибка при попытке подтверждения выполненного сообщения: %w", err))
 	}
 }
@@ -64,7 +66,7 @@ func (consumer *Consumer) sendMessage(d amqp.Delivery, userId string, newAmount 
 func (consumer *Consumer) Listen() {
 	go func() {
 		for d := range consumer.msgs {
-			var data taskData
+			var data utils.StatusTransaction
 			err := json.Unmarshal(d.Body, &data)
 			if err != nil {
 				logger.LogOperationError(fmt.Errorf("Произошла ошибка при получении данных брокером: %w", err))
@@ -72,10 +74,11 @@ func (consumer *Consumer) Listen() {
 			}
 
 			userId := data.UserID
-			newAmount := data.NewAmount
-			link := data.Link
+			status := data.Status
+			balance := data.Balance
+			link := data.Destination
 
-			go consumer.sendMessage(d, userId, newAmount, link)
+			go consumer.sendMessage(d, userId, status, balance, link)
 		}
 	}()
 }

@@ -13,7 +13,14 @@ type OutputTransaction struct {
 	Link   string  `json:"link"`
 }
 
-type StatusTransaction struct {
+type OutputTransactionResponse struct {
 	UserID string `json:"userId"`
 	Status string `json:"status"`
+}
+
+type StatusTransaction struct {
+	UserID      string  `json:"userId"`
+	Status      string  `json:"status"`
+	Balance     float64 `json:"balance"`
+	Destination string  `json:"link"`
 }
